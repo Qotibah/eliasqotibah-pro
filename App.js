@@ -6,6 +6,7 @@ import { I18nManager, LogBox } from 'react-native';
 import LoginScreen from './src/screens/LoginScreen';
 import SignUpScreen from './src/screens/SignUpScreen';
 import ForgetPasswordScreen from './src/screens/ForgetPasswordScreen';
+import homescreen from './src/screens/homescreen'; // تأكد من المسار الصحيح
 
 // لتجنب تحذيرات Firebase والتنقل
 LogBox.ignoreLogs(['Setting a timer']);
@@ -27,6 +28,7 @@ export default function App() {
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="ForgetPassword" component={ForgetPasswordScreen} />
           <Stack.Screen name="SignUp" component={SignUpScreen} />
+          <Stack.Screen name="Home" component={homescreen} />
           {/* صفحات ثانية بنضيفها لاحقاً مثل SignUp, ForgetPassword */}
         </Stack.Navigator>
       </NavigationContainer>

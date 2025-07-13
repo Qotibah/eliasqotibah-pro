@@ -20,7 +20,7 @@ export default function SignUpScreen({ navigation }) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const isPasswordStrong = (pass: string) => {
+  const isPasswordStrong = (pass) => {
     const hasUpperCase = /[A-Z]/.test(pass);
     const hasNumber = /[0-9]/.test(pass);
     const hasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(pass);
@@ -65,7 +65,7 @@ export default function SignUpScreen({ navigation }) {
 
       Alert.alert('تم إنشاء الحساب بنجاح!');
       navigation.goBack();
-    } catch (error: any) {
+    } catch (error) {
       Alert.alert('فشل التسجيل', error.message);
     }
   };

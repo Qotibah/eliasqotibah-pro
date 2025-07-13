@@ -26,7 +26,7 @@ export default function ForgetPasswordScreen({ navigation }) {
       await sendPasswordResetEmail(auth, email);
       Alert.alert('تم الإرسال', 'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني');
       navigation.goBack();
-    } catch (error: any) {
+    } catch (error) {
       Alert.alert('خطأ', error.message);
     }
   };

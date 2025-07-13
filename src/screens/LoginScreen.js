@@ -1,24 +1,15 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Dimensions,
-  Alert,
-} from 'react-native';
+import {View,Text,TextInput,TouchableOpacity,StyleSheet,Dimensions,Alert,} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../config/firebase';
+import { auth } from '../config/firebase'; // تأكد من المسار حسب مكان ملف firebase.js
+import homescreen from '../screens/homescreen';
 
 const { width, height } = Dimensions.get('window');
 
-// ✅ استخدم any لتفادي مشاكل type
 export default function LoginScreen() {
-  const navigation: any = useNavigation();
-
+  const navigation = useNavigation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -31,8 +22,9 @@ export default function LoginScreen() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       Alert.alert('تم تسجيل الدخول بنجاح!');
-      // navigation.navigate('Home'); // ضيفها لما تكون شاشة الـ Home جاهزة
-    } catch (error: any) {
+      // هون بتحول المستخدم للشاشة الرئيسية
+      // navigation.navigate('Home');
+    } catch (error) {
       Alert.alert('فشل تسجيل الدخول', error.message);
     }
   };
@@ -45,7 +37,7 @@ export default function LoginScreen() {
         end={{ x: 1, y: 1 }}
         style={styles.gradientBox}
       >
-        <Text style={styles.headerText}>تسجيل الدخول</Text>
+        <Text style={styles.headerText}>LogIn</Text>
       </LinearGradient>
 
       <View style={styles.container}>
@@ -78,6 +70,12 @@ export default function LoginScreen() {
         <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
           <Text style={styles.linkText}>ليس لديك حساب؟ أنشئ واحد الآن</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={{ marginTop: 24, alignSelf: 'center' }}
+          onPress={() => navigation.navigate('Home')} // تأكد من أن Home موجود في RootStackParamList
+        >
+            <Text style={{ color: 'gray' }}>دخول مباشر إلى الصفحة الرئيسية</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -100,7 +98,7 @@ const styles = StyleSheet.create({
   },
   headerText: {
     color: '#fff',
-    fontSize: 36,
+    fontSize: 48,
     fontWeight: 'bold',
   },
   container: {
