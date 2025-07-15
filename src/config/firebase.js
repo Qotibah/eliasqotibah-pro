@@ -1,6 +1,11 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth'; // بدون initializeAuth
+import {
+  getAuth,
+  initializeAuth,
+  getReactNativePersistence,
+} from 'firebase/auth';
+import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import { getFirestore } from 'firebase/firestore';
 
 // Your web app's Firebase configuration
@@ -14,9 +19,13 @@ const firebaseConfig = {
   measurementId: "G-FJCXM40N5T"
 };
 
-// Initialize Firebase
+
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app); // ✅ الجلسة رح تنتهي عند إغلاق التطبيق
+
+const auth = initializeAuth(app, {
+  persistence: getReactNativePersistence(ReactNativeAsyncStorage),
+});
+
 const db = getFirestore(app);
 
 export { auth, db };

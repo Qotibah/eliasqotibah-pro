@@ -22,8 +22,7 @@ export default function LoginScreen() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       Alert.alert('تم تسجيل الدخول بنجاح!');
-      // هون بتحول المستخدم للشاشة الرئيسية
-      // navigation.navigate('Home');
+      navigation.navigate('Home');
     } catch (error) {
       Alert.alert('فشل تسجيل الدخول', error.message);
     }
@@ -70,11 +69,12 @@ export default function LoginScreen() {
         <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
           <Text style={styles.linkText}>ليس لديك حساب؟ أنشئ واحد الآن</Text>
         </TouchableOpacity>
+        
         <TouchableOpacity
           style={{ marginTop: 24, alignSelf: 'center' }}
-          onPress={() => navigation.navigate('Home')} // تأكد من أن Home موجود في RootStackParamList
+          onPress={() => navigation.navigate('Home', { name: 'Rana Youssef' })}
         >
-            <Text style={{ color: 'gray' }}>دخول مباشر إلى الصفحة الرئيسية</Text>
+          <Text style={{ color: 'gray' }}>دخول مباشر إلى الصفحة الرئيسية</Text>
         </TouchableOpacity>
       </View>
     </View>

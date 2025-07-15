@@ -7,6 +7,8 @@ import LoginScreen from './src/screens/LoginScreen';
 import SignUpScreen from './src/screens/SignUpScreen';
 import ForgetPasswordScreen from './src/screens/ForgetPasswordScreen';
 import homescreen from './src/screens/homescreen'; // تأكد من المسار الصحيح
+import TransferScreen from './src/screens/TransferScreen'; // تأكد من المسار الصحيح
+import Transfaredetailscreen from './src/screens/TransferDetailsScreen'; // تأكد من المسار الصحيح
 
 // لتجنب تحذيرات Firebase والتنقل
 LogBox.ignoreLogs(['Setting a timer']);
@@ -29,6 +31,8 @@ export default function App() {
           <Stack.Screen name="ForgetPassword" component={ForgetPasswordScreen} />
           <Stack.Screen name="SignUp" component={SignUpScreen} />
           <Stack.Screen name="Home" component={homescreen} />
+          <Stack.Screen name="Transfer" component={TransferScreen} />
+          <Stack.Screen name="TransferDetails" component={Transfaredetailscreen} />
           {/* صفحات ثانية بنضيفها لاحقاً مثل SignUp, ForgetPassword */}
         </Stack.Navigator>
       </NavigationContainer>

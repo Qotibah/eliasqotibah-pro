@@ -11,15 +11,12 @@ import {
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../config/firebase'; // تأكد من المسار
 import { doc, setDoc } from 'firebase/firestore';
-
 const { width } = Dimensions.get('window');
-
 export default function SignUpScreen({ navigation }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-
   const isPasswordStrong = (pass) => {
     const hasUpperCase = /[A-Z]/.test(pass);
     const hasNumber = /[0-9]/.test(pass);
@@ -27,23 +24,19 @@ export default function SignUpScreen({ navigation }) {
     const isLongEnough = pass.length >= 8;
     return hasUpperCase && hasNumber && hasSymbol && isLongEnough;
   };
-
   const handleSignUp = async () => {
     if (!name || !email || !password || !confirmPassword) {
       Alert.alert('خطأ', 'يرجى تعبئة جميع الحقول');
       return;
     }
-
     if (name.toLowerCase() === email.toLowerCase()) {
       Alert.alert('خطأ', 'الاسم لا يجب أن يكون نفس البريد الإلكتروني');
       return;
     }
-
     if (password !== confirmPassword) {
       Alert.alert('خطأ', 'كلمتا المرور غير متطابقتين');
       return;
     }
-
     if (!isPasswordStrong(password)) {
       Alert.alert(
         'كلمة المرور ضعيفة',
@@ -51,18 +44,15 @@ export default function SignUpScreen({ navigation }) {
       );
       return;
     }
-
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const userId = userCredential.user.uid;
-
       // 🔥 حفظ الاسم في Firestore
       await setDoc(doc(db, 'users', userId), {
         name,
         email,
         createdAt: new Date(),
       });
-
       Alert.alert('تم إنشاء الحساب بنجاح!');
       navigation.goBack();
     } catch (error) {
