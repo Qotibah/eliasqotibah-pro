@@ -1,8 +1,17 @@
 // TransferDetailsScreen.js
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Dimensions,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('window');
 
@@ -19,6 +28,36 @@ export default function TransferDetailsScreen() {
     transferDetails,
     account,
   } = route.params;
+
+  const handleConfirm = async () => {
+    try {
+      // حفظ المستفيد في قائمة المفضلة
+      const favorites = JSON.parse(await AsyncStorage.getItem('favorites')) || [];
+      const newFavorite = {
+        id: Date.now(),
+        name: recipientName,
+        iban: recipientIban,
+        bank: recipientBank,
+        amount,
+        type: 'Manual',
+      };
+      await AsyncStorage.setItem('favorites', JSON.stringify([...favorites, newFavorite]));
+
+      // إضافة سجل إلى الأنشطة الأخيرة
+      const recent = JSON.parse(await AsyncStorage.getItem('recentTransactions')) || [];
+      const newTransaction = {
+        id: Date.now(),
+        name: recipientName,
+        amount: `-${parseFloat(amount).toFixed(2)}`,
+      };
+      await AsyncStorage.setItem('recentTransactions', JSON.stringify([newTransaction, ...recent]));
+
+      Alert.alert('✅ تم التحويل بنجاح');
+      navigation.navigate('Home');
+    } catch (error) {
+      Alert.alert('خطأ', 'فشل في حفظ بيانات التحويل');
+    }
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -57,9 +96,9 @@ export default function TransferDetailsScreen() {
         ) : null}
       </View>
 
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Ionicons name="arrow-back" size={24} color="#fff" />
-        <Text style={styles.backText}>عودة</Text>
+      <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
+        <Ionicons name="checkmark-circle-outline" size={24} color="#fff" />
+        <Text style={styles.confirmText}>تأكيد</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -100,9 +139,9 @@ const styles = StyleSheet.create({
     color: '#222',
     textAlign: 'right',
   },
-  backButton: {
+  confirmButton: {
     marginTop: 30,
-    backgroundColor: '#636AE8',
+    backgroundColor: '#2ecc71',
     paddingVertical: 12,
     borderRadius: 30,
     flexDirection: 'row',
@@ -110,7 +149,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
-  backText: {
+  confirmText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',

@@ -416,7 +416,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   sendButton: {
-    backgroundColor: '#c0392b',
+    backgroundColor: '#636AE8',
     borderRadius: 30,
     alignItems: 'center',
     paddingVertical: 12,
@@ -428,7 +428,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   disabledButton: {
-    backgroundColor: '#e57373',
+    backgroundColor: '#636AE8',
     opacity: 0.7,
   },
   sendText: {

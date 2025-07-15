@@ -14,7 +14,7 @@ import Transfaredetailscreen from './src/screens/TransferDetailsScreen'; // تأ
 LogBox.ignoreLogs(['Setting a timer']);
 LogBox.ignoreAllLogs();
 
-const Stack = createNativeStackNavigator();
+export const Stack = createNativeStackNavigator();
 
 export default function App() {
   // تعطيل RTL مؤقتًا إذا كان مفعل
