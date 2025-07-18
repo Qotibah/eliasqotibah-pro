@@ -1,22 +1,22 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Dimensions,
-  Alert,
-} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, Alert } from 'react-native';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth, db } from '../config/firebase'; // تأكد من المسار
+import { auth, db } from '../config/firebase';
 import { doc, setDoc } from 'firebase/firestore';
+
 const { width } = Dimensions.get('window');
+
 export default function SignUpScreen({ navigation }) {
-  const [name, setName] = useState('');
+  const [customerId, setCustomerId] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
+  const isValidCustomerId = (id) => {
+    const validPrefixes = ['IND_CUST_', 'CORP_CUST_', 'BUS_CUST_'];
+    return validPrefixes.some(prefix => id.startsWith(prefix));
+  };
+
   const isPasswordStrong = (pass) => {
     const hasUpperCase = /[A-Z]/.test(pass);
     const hasNumber = /[0-9]/.test(pass);
@@ -24,19 +24,23 @@ export default function SignUpScreen({ navigation }) {
     const isLongEnough = pass.length >= 8;
     return hasUpperCase && hasNumber && hasSymbol && isLongEnough;
   };
+
   const handleSignUp = async () => {
-    if (!name || !email || !password || !confirmPassword) {
+    if (!customerId || !email || !password || !confirmPassword) {
       Alert.alert('خطأ', 'يرجى تعبئة جميع الحقول');
       return;
     }
-    if (name.toLowerCase() === email.toLowerCase()) {
-      Alert.alert('خطأ', 'الاسم لا يجب أن يكون نفس البريد الإلكتروني');
+
+    if (!isValidCustomerId(customerId)) {
+      Alert.alert('خطأ', 'رقم العميل غير صحيح. يجب أن يبدأ بـ IND_CUST_, CORP_CUST_, أو BUS_CUST_');
       return;
     }
+
     if (password !== confirmPassword) {
       Alert.alert('خطأ', 'كلمتا المرور غير متطابقتين');
       return;
     }
+
     if (!isPasswordStrong(password)) {
       Alert.alert(
         'كلمة المرور ضعيفة',
@@ -44,15 +48,17 @@ export default function SignUpScreen({ navigation }) {
       );
       return;
     }
+
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const userId = userCredential.user.uid;
-      // 🔥 حفظ الاسم في Firestore
+
       await setDoc(doc(db, 'users', userId), {
-        name,
+        customerId,
         email,
         createdAt: new Date(),
       });
+
       Alert.alert('تم إنشاء الحساب بنجاح!');
       navigation.goBack();
     } catch (error) {
@@ -63,13 +69,15 @@ export default function SignUpScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>إنشاء حساب جديد</Text>
+
       <TextInput
         style={styles.input}
-        placeholder="الاسم"
+        placeholder="رقم العميل (Customer ID)"
         placeholderTextColor="#888"
-        value={name}
-        onChangeText={setName}
+        value={customerId}
+        onChangeText={setCustomerId}
       />
+
       <TextInput
         style={styles.input}
         placeholder="البريد الإلكتروني"
@@ -108,16 +116,8 @@ export default function SignUpScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 24, justifyContent: 'center', backgroundColor: '#fff' },
   title: { fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginBottom: 24, color: '#E8618C' },
-  input: {
-    height: 50, borderColor: '#ccc', borderWidth: 1, borderRadius: 12,
-    paddingHorizontal: 16, marginBottom: 16, backgroundColor: '#f9f9f9',
-  },
-  signupButton: {
-    backgroundColor: '#636AE8', paddingVertical: 14,
-    borderRadius: 12, alignItems: 'center',
-  },
+  input: { height: 50, borderColor: '#ccc', borderWidth: 1, borderRadius: 12, paddingHorizontal: 16, marginBottom: 16, backgroundColor: '#f9f9f9' },
+  signupButton: { backgroundColor: '#636AE8', paddingVertical: 14, borderRadius: 12, alignItems: 'center' },
   signupText: { color: '#fff', fontSize: 16, fontWeight: '600' },
-  backText: {
-    marginTop: 24, color: '#E8618C', textAlign: 'center', fontSize: 14,
-  },
+  backText: { marginTop: 24, color: '#E8618C', textAlign: 'center', fontSize: 14 },
 });
