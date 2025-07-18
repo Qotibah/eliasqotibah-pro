@@ -19,8 +19,10 @@ export default function LoginScreen() {
   const handleLogin = async () => {
     if ((!customerId && !email) || !password) {
       Alert.alert('خطأ', 'يرجى إدخال رقم العميل أو البريد الإلكتروني وكلمة المرور');
+      
       return;
     }
+
 
     try {
       let userCredential;
@@ -42,7 +44,7 @@ export default function LoginScreen() {
 
       if (docSnap.exists()) {
         const customerIdFromDB = docSnap.data().customerId;
-        navigation.navigate('Home', { customerId: customerIdFromDB });
+navigation.navigate('Home', { customerId: customerIdFromDB });
       } else {
         Alert.alert('خطأ', 'تعذر العثور على بيانات المستخدم');
       }
