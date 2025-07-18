@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, Alert } from 'react-native';
+import {
+  View, Text, TextInput, TouchableOpacity,
+  StyleSheet, Dimensions, Alert
+} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../config/firebase';
 import { doc, getDoc } from 'firebase/firestore';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo from '@react-native-community/netinfo';
 
 const { width, height } = Dimensions.get('window');
 
@@ -17,34 +20,39 @@ export default function LoginScreen() {
   const [useCustomerId, setUseCustomerId] = useState(false);
 
   const handleLogin = async () => {
-    if ((!customerId && !email) || !password) {
-      Alert.alert('خطأ', 'يرجى إدخال رقم العميل أو البريد الإلكتروني وكلمة المرور');
-      
+    const netState = await NetInfo.fetch();
+    if (!netState.isConnected) {
+      Alert.alert('لا يوجد اتصال بالإنترنت', 'يرجى التأكد من الاتصال بالشبكة ثم المحاولة مجددًا');
       return;
     }
 
+    if ((!customerId && !email) || !password) {
+      Alert.alert('خطأ', 'يرجى إدخال رقم العميل أو البريد الإلكتروني وكلمة المرور');
+      return;
+    }
 
     try {
       let userCredential;
+
       if (useCustomerId && customerId) {
-        const querySnapshot = await getDoc(doc(db, 'users', customerId)); // افتراضي
-        if (!querySnapshot.exists()) {
+        const userDoc = await getDoc(doc(db, 'users', customerId));
+        if (!userDoc.exists()) {
           Alert.alert('خطأ', 'رقم العميل غير موجود');
           return;
         }
-        const userEmail = querySnapshot.data().email;
+
+        const userEmail = userDoc.data().email;
         userCredential = await signInWithEmailAndPassword(auth, userEmail, password);
       } else {
         userCredential = await signInWithEmailAndPassword(auth, email, password);
       }
 
       const userId = userCredential.user.uid;
-      const docRef = doc(db, 'users', userId);
-      const docSnap = await getDoc(docRef);
+      const docSnap = await getDoc(doc(db, 'users', userId));
 
       if (docSnap.exists()) {
         const customerIdFromDB = docSnap.data().customerId;
-navigation.navigate('Home', { customerId: customerIdFromDB });
+        navigation.navigate('Home', { customerId: customerIdFromDB });
       } else {
         Alert.alert('خطأ', 'تعذر العثور على بيانات المستخدم');
       }
@@ -125,11 +133,27 @@ navigation.navigate('Home', { customerId: customerIdFromDB });
 
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: '#fff' },
-  gradientBox: { position: 'absolute', top: 0, width, height: height * 0.42, borderBottomLeftRadius: 64, borderBottomRightRadius: 64, justifyContent: 'center', alignItems: 'center' },
+  gradientBox: {
+    position: 'absolute', top: 0, width, height: height * 0.42,
+    borderBottomLeftRadius: 64, borderBottomRightRadius: 64,
+    justifyContent: 'center', alignItems: 'center'
+  },
   headerText: { color: '#fff', fontSize: 48, fontWeight: 'bold' },
-  container: { position: 'absolute', top: height * 0.38, width, padding: 24, backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, elevation: 10, paddingTop: 120 },
-  input: { height: 50, borderColor: '#ccc', borderWidth: 1, borderRadius: 12, paddingHorizontal: 16, marginBottom: 16, backgroundColor: '#f9f9f9' },
-  loginButton: { backgroundColor: '#636AE8', paddingVertical: 14, borderRadius: 12, alignItems: 'center', marginBottom: 12 },
+  container: {
+    position: 'absolute', top: height * 0.38, width,
+    padding: 24, backgroundColor: '#fff',
+    borderTopLeftRadius: 24, borderTopRightRadius: 24,
+    elevation: 10, paddingTop: 120
+  },
+  input: {
+    height: 50, borderColor: '#ccc', borderWidth: 1,
+    borderRadius: 12, paddingHorizontal: 16,
+    marginBottom: 16, backgroundColor: '#f9f9f9'
+  },
+  loginButton: {
+    backgroundColor: '#636AE8', paddingVertical: 14,
+    borderRadius: 12, alignItems: 'center', marginBottom: 12
+  },
   loginText: { color: '#fff', fontSize: 16, fontWeight: '600' },
   linkText: { color: '#636AE8', textAlign: 'center', marginTop: 8 },
 });

@@ -20,9 +20,9 @@ export default function HomeScreen() {
 
   useEffect(() => {
     if (customerId) {
-      fetchAccounts(customerId);
+      fetchAccounts(customerId); // 🚀 مباشرة أول ما يدخل الصفحة
     } else {
-      Alert.alert('خطأ', 'رقم العميل غير موجود');
+      Alert.alert('خطأ', 'لم يتم العثور على رقم العميل');
       setLoading(false);
     }
   }, [customerId]);
@@ -52,27 +52,29 @@ export default function HomeScreen() {
       });
 
       const result = await response.json();
+      console.log('🔁 بيانات من الـ API:', result);
 
       if (result && result['1']) {
         const data = [result['1']];
         setAccounts(data);
+
+        // 🧠 حفظها في Firestore
         await setDoc(doc(db, 'accounts', id), {
           accounts: data,
           updatedAt: new Date(),
         });
       } else {
-        throw new Error('لا يوجد بيانات من الـ API');
+        throw new Error('الـ API لم يرجع بيانات');
       }
 
     } catch (error) {
-      console.warn('JOF API Error:', error.message);
-
+      console.warn('⚠️ API Error:', error.message);
       const docSnap = await getDoc(doc(db, 'accounts', id));
       if (docSnap.exists()) {
         setAccounts(docSnap.data().accounts);
-        Alert.alert('تنبيه', 'تم استخدام البيانات المخزنة مسبقًا لعدم توفر اتصال بالـ API');
+        Alert.alert('تنبيه', 'تم استخدام بيانات محفوظة مسبقًا');
       } else {
-        Alert.alert('خطأ', 'لم يتم العثور على حسابات لهذا المستخدم');
+        Alert.alert('خطأ', 'لا يوجد بيانات حسابات متاحة');
       }
 
     } finally {
@@ -90,8 +92,8 @@ export default function HomeScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>مرحبًا 👋</Text>
-      <Text style={styles.subtitle}>رقم العميل: {customerId || 'غير متاح'}</Text>
+      <Text style={styles.title}>أهلاً وسهلاً 👋</Text>
+      <Text style={styles.subtitle}>رقم العميل: {customerId}</Text>
 
       {accounts.length > 0 ? (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.cardsScroll}>
